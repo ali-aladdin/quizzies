@@ -6,7 +6,7 @@ import '../providers/auth_provider.dart';
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
 
-  static const routeName = '/';
+  static const routeName = '/sign-in';
 
   @override
   State<SignInScreen> createState() => _SignInScreenState();
