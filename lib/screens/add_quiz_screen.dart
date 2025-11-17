@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../models/quiz.dart';
 import '../providers/auth_provider.dart';
 import '../providers/quiz_provider.dart';
+import '../widgets/gradient_scaffold.dart';
 import '../widgets/id_generator.dart';
 import '../widgets/question_form_section.dart';
 import 'sign_in_screen.dart';
@@ -103,74 +104,97 @@ class _AddQuizScreenState extends State<AddQuizScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    final theme = Theme.of(context);
+    return GradientScaffold(
       appBar: AppBar(title: const Text('Create Quiz')),
-      body: Form(
+      child: Form(
         key: _formKey,
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _titleController,
-                decoration: const InputDecoration(labelText: 'Quiz Title'),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Enter a title';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _descriptionController,
-                decoration: const InputDecoration(labelText: 'Description'),
-                maxLines: 3,
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Enter a description';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              ...List.generate(_questions.length, (index) {
-                final data = _questions[index];
-                return QuestionFormSection(
-                  data: data,
-                  index: index,
-                  onRemoveQuestion: () => _removeQuestion(index),
-                  onCorrectChanged: (value) {
-                    setState(() => data.correctAnswerIndex = value);
-                  },
-                  onAddChoice: () => _addChoice(data),
-                  onRemoveChoice: (choiceIndex) => _removeChoice(data, choiceIndex),
-                );
-              }),
-              const SizedBox(height: 12),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: TextButton.icon(
-                  onPressed: _addQuestion,
-                  icon: const Icon(Icons.add_box_outlined),
-                  label: const Text('Add Question'),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 900),
+              child: Card(
+                margin: EdgeInsets.zero,
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Quiz details',
+                        style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 12),
+                      TextFormField(
+                        controller: _titleController,
+                        decoration: const InputDecoration(labelText: 'Quiz Title'),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Enter a title';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _descriptionController,
+                        decoration: const InputDecoration(labelText: 'Description'),
+                        maxLines: 3,
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Enter a description';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        'Questions',
+                        style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                      ),
+                      const SizedBox(height: 12),
+                      ...List.generate(_questions.length, (index) {
+                        final data = _questions[index];
+                        return QuestionFormSection(
+                          data: data,
+                          index: index,
+                          onRemoveQuestion: () => _removeQuestion(index),
+                          onCorrectChanged: (value) {
+                            setState(() => data.correctAnswerIndex = value);
+                          },
+                          onAddChoice: () => _addChoice(data),
+                          onRemoveChoice: (choiceIndex) => _removeChoice(data, choiceIndex),
+                        );
+                      }),
+                      const SizedBox(height: 12),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: TextButton.icon(
+                          onPressed: _addQuestion,
+                          icon: const Icon(Icons.add_box_outlined),
+                          label: const Text('Add Question'),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton(
+                          onPressed: _isSubmitting ? null : _submit,
+                          child: _isSubmitting
+                              ? const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                )
+                              : const Text('Save Quiz'),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  onPressed: _isSubmitting ? null : _submit,
-                  child: _isSubmitting
-                      ? const SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Text('Save Quiz'),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),

@@ -16,13 +16,46 @@ class AnswerOptionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RadioListTile<int>(
-      value: value,
-      groupValue: groupValue,
-      onChanged: onChanged,
-      title: Text(label),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    final theme = Theme.of(context);
+    final isSelected = value == groupValue;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: InkWell(
+        onTap: () => onChanged(value),
+        borderRadius: BorderRadius.circular(18),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? theme.colorScheme.primaryContainer.withOpacity(0.8)
+                : theme.cardColor,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: isSelected
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.outlineVariant,
+            ),
+          ),
+          child: Row(
+            children: [
+              Radio<int>(
+                value: value,
+                groupValue: groupValue,
+                onChanged: onChanged,
+                activeColor: theme.colorScheme.primary,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  label,
+                  style: theme.textTheme.bodyLarge,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
