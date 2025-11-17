@@ -21,7 +21,8 @@ class QuestionFormData {
     if (choiceControllers.length <= 3) {
       return;
     }
-    choiceControllers.removeAt(index);
+    final removed = choiceControllers.removeAt(index);
+    removed.dispose();
     if (correctAnswerIndex >= choiceControllers.length) {
       correctAnswerIndex = choiceControllers.length - 1;
     }

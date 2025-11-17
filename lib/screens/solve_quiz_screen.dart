@@ -5,6 +5,7 @@ import '../models/quiz.dart';
 import '../models/quiz_result.dart';
 import '../providers/quiz_provider.dart';
 import '../widgets/answer_option_tile.dart';
+import '../widgets/gradient_scaffold.dart';
 import '../widgets/question_result_tile.dart';
 import 'home_screen.dart';
 
@@ -57,16 +58,38 @@ class _SolveQuizScreenState extends State<SolveQuizScreen> {
       );
     }
 
-    return Scaffold(
+    final answered = _selectedAnswers.values.whereType<int>().length;
+    final progress = quiz.questions.isEmpty ? 0.0 : answered / quiz.questions.length;
+    final theme = Theme.of(context);
+    return GradientScaffold(
       appBar: AppBar(title: Text(quiz.title)),
-      body: Padding(
+      child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              quiz.description,
-              style: Theme.of(context).textTheme.bodyLarge,
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      quiz.description,
+                      style: theme.textTheme.bodyLarge,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Created by ${quiz.createdBy}',
+                      style: theme.textTheme.bodySmall,
+                    ),
+                    const SizedBox(height: 16),
+                    LinearProgressIndicator(value: progress),
+                    const SizedBox(height: 4),
+                    Text('$answered of ${quiz.questions.length} answered'),
+                  ],
+                ),
+              ),
             ),
             const SizedBox(height: 16),
             Expanded(
@@ -78,16 +101,26 @@ class _SolveQuizScreenState extends State<SolveQuizScreen> {
                   final selectedIndex = _selectedAnswers[question.id];
                   return Card(
                     child: Padding(
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Question ${index + 1}',
-                            style: Theme.of(context).textTheme.labelLarge,
+                          Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 16,
+                                backgroundColor: theme.colorScheme.primary.withOpacity(0.1),
+                                child: Text('${index + 1}', style: theme.textTheme.bodyMedium),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  question.text,
+                                  style: theme.textTheme.titleMedium,
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 8),
-                          Text(question.text, style: Theme.of(context).textTheme.titleMedium),
                           const SizedBox(height: 12),
                           ...List.generate(question.choices.length, (choiceIndex) {
                             final choice = question.choices[choiceIndex];
@@ -107,9 +140,10 @@ class _SolveQuizScreenState extends State<SolveQuizScreen> {
             ),
             SizedBox(
               width: double.infinity,
-              child: FilledButton(
+              child: FilledButton.icon(
                 onPressed: () => _submitQuiz(quiz),
-                child: const Text('Submit Answers'),
+                icon: const Icon(Icons.celebration_outlined),
+                label: const Text('Submit Answers'),
               ),
             ),
           ],
@@ -141,19 +175,38 @@ class ResultScreen extends StatelessWidget {
     final quiz = args.quiz;
     final result = args.result;
 
-    return Scaffold(
+    final theme = Theme.of(context);
+    return GradientScaffold(
       appBar: AppBar(title: const Text('Results')),
-      body: Padding(
+      child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              quiz.title,
-              style: Theme.of(context).textTheme.headlineSmall,
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      quiz.title,
+                      style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'You answered ${result.score} out of ${result.totalQuestions} correctly.',
+                    ),
+                    const SizedBox(height: 12),
+                    LinearProgressIndicator(
+                      value: result.totalQuestions == 0
+                          ? 0
+                          : result.score / result.totalQuestions,
+                    ),
+                  ],
+                ),
+              ),
             ),
-            const SizedBox(height: 8),
-            Text('${result.score} / ${result.totalQuestions} correct'),
             const SizedBox(height: 16),
             Expanded(
               child: ListView.builder(
@@ -172,13 +225,17 @@ class ResultScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-            FilledButton(
-              onPressed: () => Navigator.pushNamedAndRemoveUntil(
-                context,
-                HomeScreen.routeName,
-                (route) => false,
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: () => Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  HomeScreen.routeName,
+                  (route) => false,
+                ),
+                icon: const Icon(Icons.home_outlined),
+                label: const Text('Back to Home'),
               ),
-              child: const Text('Back to Home'),
             ),
           ],
         ),

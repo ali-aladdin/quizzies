@@ -21,30 +21,89 @@ class LovableQuizzesApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => QuizProvider()),
       ],
-      child: MaterialApp(
-        title: 'Lovable Quizzes',
-        theme: ThemeData(
-          useMaterial3: true,
-          colorSchemeSeed: const Color(0xFF6366F1),
-          inputDecorationTheme: const InputDecorationTheme(border: OutlineInputBorder()),
-        ),
-        routes: {
-          SignInScreen.routeName: (_) => const SignInScreen(),
-          SignUpScreen.routeName: (_) => const SignUpScreen(),
-          HomeScreen.routeName: (_) => const HomeScreen(),
-          AddQuizScreen.routeName: (_) => const AddQuizScreen(),
-          ResultScreen.routeName: (_) => const ResultScreen(),
+      child: Builder(
+        builder: (context) {
+          final colorScheme = ColorScheme.fromSeed(
+            seedColor: const Color(0xFF7C3AED),
+            brightness: Brightness.light,
+          );
+          final baseTheme = ThemeData(
+            useMaterial3: true,
+            colorScheme: colorScheme,
+          );
+          return MaterialApp(
+            title: 'Lovable Quizzes',
+            theme: baseTheme.copyWith(
+              scaffoldBackgroundColor: const Color(0xFFF8FAFC),
+              textTheme: baseTheme.textTheme.apply(
+                bodyColor: const Color(0xFF111827),
+                displayColor: const Color(0xFF0F172A),
+              ),
+              appBarTheme: AppBarTheme(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                foregroundColor: colorScheme.onSurface,
+                centerTitle: true,
+                titleTextStyle: baseTheme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.onSurface,
+                ),
+              ),
+              cardTheme: CardTheme(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                elevation: 0,
+                color: Colors.white,
+                surfaceTintColor: Colors.white,
+              ),
+              inputDecorationTheme: InputDecorationTheme(
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(color: Colors.indigo.shade100),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(color: Colors.indigo.shade100),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(color: colorScheme.primary, width: 1.8),
+                ),
+                labelStyle: TextStyle(color: Colors.indigo.shade600),
+              ),
+              filledButtonTheme: FilledButtonThemeData(
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                  textStyle: const TextStyle(fontWeight: FontWeight.w600),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                ),
+              ),
+              chipTheme: baseTheme.chipTheme.copyWith(
+                backgroundColor: colorScheme.primaryContainer,
+                selectedColor: colorScheme.primary,
+                labelStyle: TextStyle(color: colorScheme.onPrimaryContainer),
+              ),
+            ),
+            routes: {
+              SignInScreen.routeName: (_) => const SignInScreen(),
+              SignUpScreen.routeName: (_) => const SignUpScreen(),
+              HomeScreen.routeName: (_) => const HomeScreen(),
+              AddQuizScreen.routeName: (_) => const AddQuizScreen(),
+              ResultScreen.routeName: (_) => const ResultScreen(),
+            },
+            onGenerateRoute: (settings) {
+              if (settings.name == SolveQuizScreen.routeName) {
+                return MaterialPageRoute(
+                  settings: settings,
+                  builder: (_) => const SolveQuizScreen(),
+                );
+              }
+              return null;
+            },
+            home: const _RootRouter(),
+          );
         },
-        onGenerateRoute: (settings) {
-          if (settings.name == SolveQuizScreen.routeName) {
-            return MaterialPageRoute(
-              settings: settings,
-              builder: (_) => const SolveQuizScreen(),
-            );
-          }
-          return null;
-        },
-        home: const _RootRouter(),
       ),
     );
   }
